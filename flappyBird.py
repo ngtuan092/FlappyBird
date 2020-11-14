@@ -22,6 +22,7 @@ fpsClock = pygame.time.Clock()
 # create a surface object which we draw on window
 DISPLAYSURF = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
 pygame.display.set_caption('Flappy Bird')
+pygame.display.set_icon(pygame.image.load('img/flyingDuck.jpg'))
 pygame.init()
 
 class Bird:
@@ -50,12 +51,28 @@ class Bird:
     def jump(self):
         self.speed = Bird.SPEEDFLY
 
+class Score:
+    POS_X = 50
+    POS_Y = 16
+    def __init__(self):
+        self.val = 0
+    
+    def inc(self):
+        self.val += 1
+
+    def Frame(self):
+        font = pygame.font.Font('freesansbold.ttf', 32)
+        text = font.render(str(self.val),True, (0, 0, 0))
+        text.get_rect().center = (Score.POS_X, Score.POS_Y)
+        return text, text.get_rect()
     
 def main():
     '''the game's main loop'''
     bird = Bird()
     col = Columns()
     GameOver = False
+    ScoreBoard = Score()
+    DISC = 0
     while True:
         Jump = False
         for event in pygame.event.get():
@@ -70,18 +87,33 @@ def main():
                 bird = Bird()
                 col = Columns()
                 GameOver = False
+                ScoreBoard.val = 0
+                DISC = 0
         
         DISPLAYSURF.blit(BG, (0, 0))
+        bird.draw()
+        col.draw()
+        DISPLAYSURF.blit(*ScoreBoard.Frame())
+        
         if not GameOver:
-            col.draw()
+            
             col.move()
-            bird.draw()
+            
             bird.fall()
             GameOver = isGameOver(bird, col)
+            
             if Jump:
                 bird.jump()
+            DISC += Columns.SPEED
+            if DISC > Columns.DISTANCE + Columns.WIDTH:
+                ScoreBoard.inc()
+                DISC = 0
+            
+            
+            
             pygame.display.update()
         fpsClock.tick(FPS)
+        
 
 
 
