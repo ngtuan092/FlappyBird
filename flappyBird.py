@@ -152,12 +152,16 @@ class Columns:
             DISPLAYSURF.blit(self.surf, (x, y - self.height))
             DISPLAYSURF.blit(self.surf, (x, y + self.blank))
 
+
+
 def rectCollision(rect1, rect2):
+    """check two rectangles if they are colliding"""
     if rect1[0] <= rect2[0]+rect2[2] and rect2[0] <= rect1[0]+rect1[2] and rect1[1] <= rect2[1]+rect2[3] and rect2[1] <= rect1[1]+rect1[3]:
         return True
     return False
 
 def isGameOver(bird, columns):
+    """get bird and columns hit-box and return whether they collide. if collide, the game is over."""
     for i in range(3):
         rectBird = [bird.x, bird.y, bird.w, bird.h]
         rectColumn1 = [columns.ls[i][0], columns.ls[i][1] - columns.height, columns.width, columns.height]
@@ -167,4 +171,7 @@ def isGameOver(bird, columns):
     if bird.y + bird.h < 0 or bird.y + bird.h > WIN_HEIGHT:
         return True
     return False
-main()
+
+
+if __name__ == "__main__":
+    main()
