@@ -2,7 +2,7 @@ import pygame
 from pygame.locals import *
 import sys
 import random
-WIN_HEIGHT = 600
+WIN_HEIGHT = 500
 WIN_WIDTH = 400
 
 
@@ -20,9 +20,9 @@ FPS = 60 # frame per second
 fpsClock = pygame.time.Clock()
 
 # create a surface object which we draw on window
-DISPLAYSURF = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
+DISPLAYSURF = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT + 100))
 pygame.display.set_caption('Flappy Bird')
-pygame.display.set_icon(pygame.image.load('img/flyingDuck.jpg'))
+pygame.display.set_icon(pygame.image.load('img/flyingDuck.png'))
 pygame.init()
 
 class Bird:
@@ -30,7 +30,7 @@ class Bird:
     BIRDHEIGHT = 45
     G = 0.5
     SPEEDFLY = -8
-    IMG = BIRD_IMG
+    IMG = pygame.transform.scale(BIRD_IMG, (BIRDWIDTH, BIRDHEIGHT))
 
     def __init__(self):
         self.w = Bird.BIRDWIDTH
@@ -60,18 +60,23 @@ class Score:
     def inc(self):
         self.val += 1
 
-    def Frame(self):
+    def frame(self):
         font = pygame.font.Font('freesansbold.ttf', 32)
         text = font.render(str(self.val),True, (0, 0, 0))
         text.get_rect().center = (Score.POS_X, Score.POS_Y)
         return text, text.get_rect()
-    
+
+    def draw(self):
+        DISPLAYSURF.blit(*self.frame())
+
+
+
 def main():
     '''the game's main loop'''
     bird = Bird()
     col = Columns()
-    GameOver = False
-    ScoreBoard = Score()
+    GameOver = True
+    scoreBoard = Score()
     DISC = 0
     while True:
         Jump = False
@@ -87,18 +92,19 @@ def main():
                 bird = Bird()
                 col = Columns()
                 GameOver = False
-                ScoreBoard.val = 0
+                scoreBoard.val = 0
                 DISC = 0
         
         DISPLAYSURF.blit(BG, (0, 0))
+        
         bird.draw()
         col.draw()
-        DISPLAYSURF.blit(*ScoreBoard.Frame())
-        
+        scoreBoard.draw()
+
+
         if not GameOver:
             
             col.move()
-            
             bird.fall()
             GameOver = isGameOver(bird, col)
             
@@ -106,13 +112,11 @@ def main():
                 bird.jump()
             DISC += Columns.SPEED
             if DISC > Columns.DISTANCE + Columns.WIDTH:
-                ScoreBoard.inc()
+                scoreBoard.inc()
                 DISC = 0
             
-            
-            
-            pygame.display.update()
-        fpsClock.tick(FPS)
+        pygame.display.update()
+        fpsClock.tick(FPS) # 1 tick equal to 1 / FPS
         
 
 
@@ -121,7 +125,7 @@ class Columns:
     ''' obstacle's init and moving rule'''
     WIDTH = 60
     HEIGHT = 500
-    BLANK = 200
+    BLANK = 150
     DISTANCE = 200
     SPEED = 2
     IMG = COL_IMG
